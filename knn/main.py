@@ -1,11 +1,22 @@
 
 from sklearn.datasets import make_blobs, make_classification
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 from sklearn.neighbors import KNeighborsClassifier as SKKNC
 from KNeighborsClassifier import KNeighborsClassifier as ACKNC
+
+
+def metrics(k, y, yp):
+    print(
+f"""\
+{k} : \n\
+{accuracy_score(y, yp)} \n\
+{precision_score(y, yp)} \n\
+{recall_score(y, yp)}\
+"""
+    )
 
 if __name__ == '__main__':
 
@@ -27,9 +38,7 @@ if __name__ == '__main__':
 
         ac_clf.fit(X_train, y_train)
         y_pred1 = ac_clf.predict(X_test)
-        print(f"{k} : {accuracy_score(y_test, y_pred1)}")
-
+        metrics(k, y_test, y_pred1)
         sk_clf.fit(X_train, y_train)
         y_pred2 = sk_clf.predict(X_test)
-        print(f"{k} : {accuracy_score(y_test, y_pred1)}")
-        print()
+        metrics(k, y_test, y_pred2)
