@@ -2,6 +2,7 @@
 from sklearn.datasets import make_blobs, make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 from sklearn.neighbors import KNeighborsClassifier as SKKNC
 from KNeighborsClassifier import KNeighborsClassifier as ACKNC
@@ -15,6 +16,10 @@ if __name__ == '__main__':
 
     X_train, X_test, y_train, y_test = \
         train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    scaler  = MinMaxScaler().fit(X_train, y_train)
+    X_train = scaler.transform(X_train)
+    X_test  = scaler.transform(X_test)
 
     for k in range(1, k_range):
         ac_clf = ACKNC(k=k)
