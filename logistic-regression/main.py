@@ -1,12 +1,9 @@
-import numpy as np
-
-
-from sklearn.metrics import accuracy_score
 from sklearn.datasets import make_classification
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
-from LogisticRegression import LogisticRegression as ACLR
+from LogisticRegression   import LogisticRegression as ACLR
 from sklearn.linear_model import LogisticRegression as SKLR
 
 def main():
