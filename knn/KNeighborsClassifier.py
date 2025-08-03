@@ -37,3 +37,7 @@ class KNeighborsClassifier:
             # predict class from k nearest
             y_pred[i] = self._predict_nn(dists)
         return y_pred
+    
+    def score(self, y_true, y_pred):
+        matches = [1 if a==b else 0 for a,b in zip(y_true, y_pred)]
+        return float(matches) / len(y_true)
