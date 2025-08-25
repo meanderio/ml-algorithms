@@ -1,6 +1,5 @@
 import numpy as np
-
-import sys
+np.random.seed(42)
 
 
 class NeuralNetwork:
@@ -59,8 +58,8 @@ class NeuralNetwork:
             self.biases[i]  -= self.alpha * dbs[i]
 
     def _binary_cross_entropy(self, y_hat, y):
-        epsilon = 1e-10
-        return - ((y * np.log(y_hat + epsilon)) + (1 + y) * np.log(1 - y_hat + epsilon))
+        epsilon = 0 #1e-10
+        return - (((y * np.log(y_hat + epsilon)) + (1 + y) * np.log(1 - y_hat + epsilon)))
 
     def calculate_cost(self, y_hat, y):
         m    = y.shape[1]
