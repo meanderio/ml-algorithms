@@ -1,6 +1,7 @@
 from NeuralNet import NeuralNetwork
 
 from sklearn.datasets        import make_classification
+from sklearn.datasets        import load_digits
 from sklearn.preprocessing   import scale
 from sklearn.model_selection import train_test_split
 from sklearn.metrics         import accuracy_score
@@ -8,13 +9,13 @@ from sklearn.metrics         import accuracy_score
 import matplotlib.pyplot as plt
 
 def main():
-    n_samples    = 10_000
+    n_samples    = 20_000
     n_features   = 4
     n_redundant  = 0
     n_classes    = 2
     random_state = 42
     alpha        = 0.01
-    n_iterations = 5_000
+    n_iterations = 1_000
     
     X, y = make_classification(
         n_samples     = n_samples,
@@ -25,6 +26,10 @@ def main():
         weights       = [0.5, 0.5],
         random_state  = random_state
     )
+
+    #X, y = load_digits(return_X_y=True)
+    #print(X.shape, y.shape)
+    #print(y)
     
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -38,7 +43,8 @@ def main():
 
     layers = [
         X.shape[1], # input layer, use features
-        4,
+        3,
+        3,
         1 # output layer, binary classifier [ 0, 1 ]
     ]
 

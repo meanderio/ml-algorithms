@@ -77,13 +77,20 @@ class NeuralNetwork:
         A = []
         for i in range(self.n_layers):
             z = self.weights[i] @ z + self.biases[i]
-            z = self.activation(z); A.append(z)
+            z = self.activation(z)
+            #print(z)
+            if (i+1 == len(self.layers)) and (self.layers[i] > 1): z = z.argmax(0)
+            A.append(z)
         return A[-1], A
 
     def activation(self, z):
-        return self._tanh(z)
+        return self._leaky_relu(z)
+        #return self._tanh(z)
         #return self._sigmoid(z)
 
+    def _leaky_relu(self, z, alpha=0.01):
+        return np.where(z > 0, z, alpha * z)
+    
     def _tanh(self, z):
         e_pos = np.exp(z)
         e_neg = np.exp(-z)
@@ -113,4 +120,8 @@ class NeuralNetwork:
         return y_hat
 
     def predict(self, X):
-        return np.where(self.predict_proba(X) > 0.5, 1, 0)
+        y_hat = self.predict_proba(X)
+        if self.layers[-1] == 1:
+            return np.where(y_hat > 0.5, 1, 0)
+        print(y_hat)
+        return y_hat.argmax(0)
