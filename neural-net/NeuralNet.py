@@ -1,5 +1,6 @@
 import numpy as np
 np.random.seed(42)
+import sys
 
 
 class NeuralNetwork:
@@ -57,14 +58,17 @@ class NeuralNetwork:
             self.weights[i] -= self.alpha * dws[i]
             self.biases[i]  -= self.alpha * dbs[i]
 
+    def _rmse(self, y_hat, y):
+        return np.sqrt(np.mean((y_hat - y) ** 2))
+    
     def _binary_cross_entropy(self, y_hat, y):
-        epsilon = 0 #1e-10
-        return - (((y * np.log(y_hat + epsilon)) + (1 + y) * np.log(1 - y_hat + epsilon)))
+        epsilon = 1e-10
+        return - np.sum((((y * np.log(y_hat + epsilon)) + (1 + y) * np.log(1 - y_hat + epsilon))))
 
     def calculate_cost(self, y_hat, y):
         m    = y.shape[1]
-        loss = self._binary_cross_entropy(y_hat, y)
-        cost = (1 / m) * np.sum(loss, axis=1)
+        loss = self._rmse(y_hat, y)
+        cost = (1 / m) * loss
         self.costs.append(np.sum(cost))
         return self.costs[-1]
 
@@ -77,31 +81,31 @@ class NeuralNetwork:
         return A[-1], A
 
     def activation(self, z):
-        return self._sigmoid(z)
+        return self._tanh(z)
+        #return self._sigmoid(z)
+
+    def _tanh(self, z):
+        e_pos = np.exp(z)
+        e_neg = np.exp(-z)
+        return (e_pos - e_neg) / (e_pos + e_neg)
 
     def _sigmoid(self, z):
         return 1 / (1 + np.exp(-z))
 
     def back_prop(self, X, y_hat, y, A):
+        A.insert(0, X.T)
         dws, dbs = [0] * self.n_layers, [0] * self.n_layers
-        m  = y_hat.shape[1]
-        dw = ((1/m) * (A[-1] - y)) @ A[-1-1].T
-        db = np.sum((1/m) * (A[-1] - y), keepdims=True)
-        dz = self.weights[-1].T @ ((1/m) * (A[-1] - y))
-
-        dws[-1] = dw; dbs[-1] = db
-
-        for i in range(self.n_layers-2,0,-1):
-            dw = (dz * (A[i] * (1 - A[i]))) @ A[i-1].T
-            db = np.sum(dw, axis=1, keepdims=True)
-            dz = self.weights[i].T @ (dz * (A[i] * (1 - A[i])))
-            dws[i] = dw
-            dbs[i] = db
-
-        dw = (dz * (A[0] * (1 - A[0]))) @ X
-        db = np.sum(dw, axis=1, keepdims=True)
-        dws[0] = dw; dbs[0] = db
-
+        m        = y_hat.shape[1]
+        dz       = 1
+        for i in range(self.n_layers-1,-1,-1):
+            # back prop errors
+            da = dz * ((1/m) * (A[i+1] - y))
+            dw = da @ A[i].T
+            db = np.sum(da, keepdims=True)
+            # add weight and biases updates
+            dws[i] = dw; dbs[i] = db
+            # calculate propagator
+            dz = self.weights[i].T @ da
         return dws, dbs
 
     def predict_proba(self, X):

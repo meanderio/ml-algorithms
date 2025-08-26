@@ -8,13 +8,13 @@ from sklearn.metrics         import accuracy_score
 import matplotlib.pyplot as plt
 
 def main():
-    n_samples    = 12_000
-    n_features   = 2
+    n_samples    = 10_000
+    n_features   = 4
     n_redundant  = 0
     n_classes    = 2
     random_state = 42
-    alpha        = 0.1
-    n_iterations = 100
+    alpha        = 0.01
+    n_iterations = 5_000
     
     X, y = make_classification(
         n_samples     = n_samples,
@@ -38,7 +38,7 @@ def main():
 
     layers = [
         X.shape[1], # input layer, use features
-        3,
+        4,
         1 # output layer, binary classifier [ 0, 1 ]
     ]
 
