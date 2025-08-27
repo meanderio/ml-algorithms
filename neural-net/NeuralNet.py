@@ -12,18 +12,6 @@ class NeuralNetwork:
         self.weights    = self._initialize_weights()
         self.biases     = self._initialize_biases()
         self.costs      = []
-        self.n_samples  = 0
-        self.n_features = 0
-
-    def debug(self,):
-        print("layers")
-        print(self.layers)
-
-        print("weights")
-        for W in self.weights: print(W.shape)
-
-        print("biases")
-        for b in self.biases: print(b.shape)
 
     def _initialize_weights(self,):
         weights = []
@@ -35,22 +23,30 @@ class NeuralNetwork:
     def _initialize_biases(self,):
         biases = []
         for i in range(1, len(self.layers)):
+            #b = np.zeros((self.layers[i],1))
             b = np.random.randn(self.layers[i],1)
             biases.append(b)
         return biases
 
     def fit(self, X, y):
-        self.n_samples, self.n_features = X.shape
-        y = y.reshape(1, self.n_samples)
+        batch = 1_000
+        n_samples, n_features = X.shape
+        y = y.reshape(1, n_samples)
         for _ in range(self.n_iters):
-            # feed forward to get y_pred
-            y_hat, A = self.feed_forward(X)
-            # calculate cost
-            cost  = self.calculate_cost(y_hat, y)
-            # backprop to update weights
-            dws, dbs = self.back_prop(X, y_hat, y, A)
-            # update the weights and biases
-            self.gradient_descent(dws, dbs)
+            for i in range(0,n_samples, batch):
+                x_i = X[i:i+batch,:]
+                y_i = y[:,i:i+batch]
+                # feed forward to get y_pred
+                #y_hat, A = self.feed_forward(X)
+                y_hat, A = self.feed_forward(x_i)
+                # calculate cost
+                #cost  = self.calculate_cost(y_hat, y)
+                cost  = self.calculate_cost(y_hat, y_i)
+                # backprop to update weights
+                #dws, dbs = self.back_prop(X, y_hat, y, A)
+                dws, dbs = self.back_prop(x_i, y_hat, y_i, A)
+                # update the weights and biases
+                self.gradient_descent(dws, dbs)
         return None
 
     def gradient_descent(self, dws, dbs):
@@ -67,6 +63,11 @@ class NeuralNetwork:
 
     def calculate_cost(self, y_hat, y):
         m    = y.shape[1]
+        # argmax if necessary
+        if y_hat.shape[0] != 1:
+            y_hat = np.argmax(y_hat, axis=0)
+            y_hat = y_hat.reshape(1, m)
+        #print(y, y_hat)
         loss = self._rmse(y_hat, y)
         cost = (1 / m) * loss
         self.costs.append(np.sum(cost))
@@ -78,15 +79,13 @@ class NeuralNetwork:
         for i in range(self.n_layers):
             z = self.weights[i] @ z + self.biases[i]
             z = self.activation(z)
-            #print(z)
-            if (i+1 == len(self.layers)) and (self.layers[i] > 1): z = z.argmax(0)
             A.append(z)
         return A[-1], A
 
     def activation(self, z):
-        return self._leaky_relu(z)
+        #return self._leaky_relu(z)
         #return self._tanh(z)
-        #return self._sigmoid(z)
+        return self._sigmoid(z)
 
     def _leaky_relu(self, z, alpha=0.01):
         return np.where(z > 0, z, alpha * z)
@@ -98,21 +97,31 @@ class NeuralNetwork:
 
     def _sigmoid(self, z):
         return 1 / (1 + np.exp(-z))
-
+  
     def back_prop(self, X, y_hat, y, A):
         A.insert(0, X.T)
         dws, dbs = [0] * self.n_layers, [0] * self.n_layers
         m        = y_hat.shape[1]
         dz       = 1
+        t = 0
         for i in range(self.n_layers-1,-1,-1):
             # back prop errors
-            da = dz * ((1/m) * (A[i+1] - y))
+            if t == 0:
+                # output layer diff
+                # THIS NEEDS TO BE FIXED FOR Y DIMS
+                delta = (1/m) * (A[i+1] - y)
+                print(y.shape, A[i+1].shape, delta.shape);sys.exit()
+            else:
+                # all other layers
+                delta = A[i+1] * (1 - A[i+1])
+            da = dz * delta
             dw = da @ A[i].T
             db = np.sum(da, keepdims=True)
             # add weight and biases updates
             dws[i] = dw; dbs[i] = db
             # calculate propagator
             dz = self.weights[i].T @ da
+            t+=1
         return dws, dbs
 
     def predict_proba(self, X):
@@ -123,5 +132,4 @@ class NeuralNetwork:
         y_hat = self.predict_proba(X)
         if self.layers[-1] == 1:
             return np.where(y_hat > 0.5, 1, 0)
-        print(y_hat)
-        return y_hat.argmax(0)
+        return np.argmax(y_hat, axis=0)
