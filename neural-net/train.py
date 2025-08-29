@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 
 from DenseLayer import DenseLayer
 from ReLU       import ReLU
+from Sigmoid    import Sigmoid
+from Tanh       import Tanh
+from Softmax    import Softmax
 
 def main():
 
@@ -29,10 +32,16 @@ def main():
     print(f"Test labels shape:\t{y_test.shape}")
     
     layer_1 = DenseLayer(X_train.shape[1], 32)
-    layer_1.forward(X_train)
     activ_1 = ReLU()
+    layer_2 = DenseLayer(32, 4)
+    activ_2 = Softmax()
+
+    layer_1.forward(X_train)
     activ_1.forward(layer_1.output)
-    print(activ_1.output)
+    layer_2.forward(activ_1.output)
+    activ_2.forward(layer_2.output)
+
+    print(activ_2.output)
 
 if __name__ == '__main__':
     main()
