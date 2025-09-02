@@ -51,6 +51,7 @@ class NeuralNetwork:
                 dws, dbs = self.back_prop(x_i, y_hat, y_i, A)
                 # update the weights and biases
                 self.gradient_descent(dws, dbs)
+                print(cost)
         return None
 
     def gradient_descent(self, dws, dbs):

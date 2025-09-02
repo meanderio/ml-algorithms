@@ -20,7 +20,7 @@ def main():
     n_redundant  = 0
     n_classes    = 10
     alpha        = 0.1
-    n_iterations = 100
+    n_iterations = 1000
     batch_size   = 10_000
     
     """
@@ -67,7 +67,7 @@ def main():
     
     layers = [
         X_train.shape[1], # input layer
-        512,
+        32,
         10 # output layer
     ]
     #"""
