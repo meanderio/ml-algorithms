@@ -19,7 +19,7 @@ class Node:
         pass
 
 
-class DecisionTreeClassifier:
+class DecisionTree:
     def __init__(self, min_samples=2, max_depth=3):
         self.root = Node()
         self.min_samples = min_samples
@@ -54,12 +54,20 @@ class DecisionTreeClassifier:
         return np.array(ld), np.array(rd)
     
     def find_best_split(self, dataset, num_samples, num_features):
-        best_split = {'gain':-1, 'feature': None, 'threshold': None}
+        best_split = {
+            'gain':-1, 
+            'feature': None, 
+            'threshold': None,
+            'left_data': None,
+            'right_data': None
+        }
         for f_idx in range(num_features):
             f_vals = dataset[:,f_idx]
             thresholds = np.unique(f_vals)
             for threshold in thresholds:
                 ld, rd = self.split_data(dataset, f_idx, threshold)
+
+                
                 if len(ld) and len(rd):
                     cur_ig = self.information_gain(dataset[:, -1], ld[:, -1], rd[:, -1])
                     if cur_ig > best_split["gain"]: 
@@ -81,7 +89,7 @@ class DecisionTreeClassifier:
 
         if n_samples >= self.min_samples and current_depth <= self.max_depth:
             best_split = self.find_best_split(dataset, n_samples, n_features)
-            if best_split["gain"]:
+            if best_split["gain"] > 0:
                 
                 left_node  = self.build_tree(best_split["left_data"], current_depth+1)
                 right_node = self.build_tree(best_split["right_data"], current_depth+1)
@@ -97,8 +105,7 @@ class DecisionTreeClassifier:
         return Node(value=leaf_value)
 
     def fit(self, X, y):
-        print(X.shape, y.shape)
-        dataset   = np.concatenate((X, y.reshape(y.shape[0], 1)), axis=1)  
+        dataset   = np.concatenate((X, y.reshape(y.shape[0], 1)), axis=1)
         self.root = self.build_tree(dataset)
         pass
     

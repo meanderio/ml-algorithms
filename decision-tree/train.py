@@ -1,16 +1,16 @@
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from DecisionTreeClassifier import DecisionTreeClassifier as ACDT
+from DecisionTree import DecisionTree as ACDT
 
 from sklearn.datasets import make_classification
 from sklearn.tree     import DecisionTreeClassifier as SKDT
 from sklearn.metrics  import accuracy_score
 
 def train():
-    n_samples     = 1_000
+    n_samples     = 100
     n_features    = 16
     n_informative = 12
-    n_classes     = 2
+    n_classes     = 3
     test_size     = 0.2
     random_state  = 42
     
@@ -39,6 +39,7 @@ def train():
 
     ac_dt.fit(X_train, y_train)
     y_pred = ac_dt.predict(X_test)
+    print(y_pred)
     print(f"accuracy: {accuracy_score(y_true=y_test, y_pred=y_pred)}")
 
     sk_dt.fit(X_train, y_train)
