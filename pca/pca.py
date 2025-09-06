@@ -14,7 +14,7 @@ class PCA:
         
         # create covariance
         cov = np.cov(X.T)
-        
+
         # create eigen vectors and eigen values
         eigenvalues, eigenvectors = np.linalg.eig(cov)
 
@@ -24,7 +24,6 @@ class PCA:
         eigenvalues     = eigenvalues[idxs]
         eigenvectors    = eigenvectors[idxs]
         self.components = eigenvectors[:, :self.n_components]
-        print(self.components.shape)
 
         # transform the data
         return np.dot(X, self.components)
